@@ -1,6 +1,10 @@
 package cuckoo
 
-import "github.com/dgryski/go-metro"
+import (
+	"math/rand"
+
+	"github.com/dgryski/go-metro"
+)
 
 func getNextPow2(n uint64) uint {
 	n--
@@ -33,4 +37,12 @@ func getIndexAndFingerprint(data []byte, bucketPow uint) (uint, fingerprint) {
 	// most significant bits for deriving index.
 	i1 := uint(hash>>32) & masks[bucketPow]
 	return i1, fingerprint(fp)
+}
+
+// selects a random index out of primary index and secondary index
+func pickRandomIndex(pi uint, si uint) uint {
+	if rand.Intn(2) == 0 {
+		return pi
+	}
+	return si
 }
