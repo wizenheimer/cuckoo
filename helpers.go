@@ -1,5 +1,7 @@
 package cuckoo
 
+import "github.com/dgryski/go-metro"
+
 func getNextPow2(n uint64) uint {
 	n--
 	n |= n >> 1
@@ -10,4 +12,25 @@ func getNextPow2(n uint64) uint {
 	n |= n >> 32
 	n++
 	return uint(n)
+}
+
+func getAltIndex(fp fingerprint, i uint, bucketPow uint) uint {
+	mask := masks[bucketPow]
+	hash := altHash[fp] & mask
+	return (i & mask) ^ hash
+}
+
+// least significant bits for fingerprint.
+func getFingerprint(hash uint64) byte {
+	fp := byte(hash%255 + 1)
+	return fp
+}
+
+// returns the 2 bucket indices and fingerprint to be used
+func getIndexAndFingerprint(data []byte, bucketPow uint) (uint, fingerprint) {
+	hash := metro.Hash64(data, 1337)
+	fp := getFingerprint(hash)
+	// most significant bits for deriving index.
+	i1 := uint(hash>>32) & masks[bucketPow]
+	return i1, fingerprint(fp)
 }
