@@ -74,3 +74,12 @@ func (cf *Filter) Lookup(data []byte) bool {
 	si := getAltIndex(fp, pi, cf.bucketPow)
 	return cf.buckets[si].getFingerprintIndex(fp) != -1
 }
+
+func (cf *Filter) Delete(data []byte) bool {
+	i1, fp := getIndexAndFingerprint(data, cf.bucketPow)
+	if cf.delete(fp, i1) {
+		return true
+	}
+	i2 := getAltIndex(fp, i1, cf.bucketPow)
+	return cf.delete(fp, i2)
+}
