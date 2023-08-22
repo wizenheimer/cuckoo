@@ -27,7 +27,7 @@ func (b *bucket) delete(fp fingerprint) bool {
 }
 
 // This function is used to reset fingerprint along the bucket
-func (b *bucket) reset() {
+func (b *bucket) _() {
 	for i := range b {
 		b[i] = emptyfp
 	}
