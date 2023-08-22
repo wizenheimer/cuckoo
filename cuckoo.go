@@ -9,6 +9,7 @@ import (
 // represents the available size of slots at each index
 const bucketSize = 4
 const hashSeed uint64 = 1337
+const maxTries = 500
 
 // instead of storing the data we store the fingerprint
 type fingerprint byte
@@ -48,4 +49,19 @@ func New(capacity uint) *Filter {
 		count:     0,
 		bucketPow: uint(bits.TrailingZeros(capacity)),
 	}
+}
+
+func (cf *Filter) Insert(data []byte) bool {
+	pi, fp := getIndexAndFingerprint(data, cf.bucketPow)
+	if cf.primaryInsert(fp, pi) {
+		return true
+	}
+
+	si := getAltIndex(fp, pi, cf.bucketPow)
+	if cf.primaryInsert(fp, si) {
+		return true
+	}
+
+	index := pickRandomIndex(pi, si)
+	return cf.secondaryInsert(fp, index)
 }
