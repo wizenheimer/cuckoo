@@ -65,3 +65,12 @@ func (cf *Filter) Insert(data []byte) bool {
 	index := pickRandomIndex(pi, si)
 	return cf.secondaryInsert(fp, index)
 }
+
+func (cf *Filter) Lookup(data []byte) bool {
+	pi, fp := getIndexAndFingerprint(data, cf.bucketPow)
+	if cf.buckets[pi].getFingerprintIndex(fp) != -1 {
+		return true
+	}
+	si := getAltIndex(fp, pi, cf.bucketPow)
+	return cf.buckets[si].getFingerprintIndex(fp) != -1
+}
